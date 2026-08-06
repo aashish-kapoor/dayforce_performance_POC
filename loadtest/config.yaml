@@ -1,6 +1,6 @@
 version: v1.0
 testName: DayforcePOCLoadTest
-testPlan: practice.jmx                  # Name of your downloaded JMX file
+testPlan: practice_v2.jmx                  # Name of your downloaded JMX file
 description: Automated Azure Load Test
 
 # Load configuration
