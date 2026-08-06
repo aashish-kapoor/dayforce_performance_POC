@@ -11,6 +11,8 @@ jobs:
   run-load-test:
     name: Run JMeter Load Test on Azure Load Testing
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: 'true'
 
     steps:
       - name: Checkout repository
@@ -22,11 +24,6 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Set up Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
 
       - name: Run Azure Load Test
         uses: azure/load-testing@v1
