@@ -1,0 +1,47 @@
+name: Dayforce Performance POC - Load Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run-load-test:
+    name: Run JMeter Load Test on Azure Load Testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run Azure Load Test
+        uses: azure/load-testing@v1
+        with:
+          loadTestConfigFile: 'loadtest/config.yaml'
+          loadTestResource: ${{ vars.AZURE_LOAD_TEST_RESOURCE_NAME }}
+          resourceGroup: ${{ vars.AZURE_LOAD_TEST_RESOURCE_GROUP }}
+
+      - name: Publish HTML summary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-html-report
+          path: loadTest/**/*.html
+          if-no-files-found: warn
+
+      - name: Publish raw CSV results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-raw-csv
+          path: loadTest/**/*.csv
+          if-no-files-found: warn
