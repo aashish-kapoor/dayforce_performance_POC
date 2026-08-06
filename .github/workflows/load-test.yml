@@ -12,8 +12,8 @@ jobs:
     name: Run JMeter Load Test on Azure Load Testing
     runs-on: ubuntu-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: 'true'
-
+      ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node20
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
