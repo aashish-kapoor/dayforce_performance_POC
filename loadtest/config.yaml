@@ -5,6 +5,8 @@ description: Automated Azure Load Test
 
 # Load configuration
 engineInstances: 1                      # Number of test engine instances
+configFileNames:
+  - jmeter-plugins-influxdb2-listener-2.8.jar
 failureCriteria:                        # Set pass/fail criteria for pipeline
   - p90(response_time_ms) > 1000        # Fails pipeline if 90th percentile > 1 sec
   - percentage(error) > 1               # Fails pipeline if error rate > 1%
