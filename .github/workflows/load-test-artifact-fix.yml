@@ -1,45 +1,43 @@
 name: Dayforce Performance POC - Load Test
-
 on:
   workflow_dispatch:
-
 permissions:
   id-token: write
   contents: read
-
 jobs:
   run-load-test:
     name: Run JMeter Load Test on Azure Load Testing
     runs-on: ubuntu-latest
+    env:
+      ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node20
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Azure login (OIDC)
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
       - name: Run Azure Load Test
         uses: azure/load-testing@v1
         with:
           loadTestConfigFile: 'loadtest/config.yaml'
           loadTestResource: ${{ vars.AZURE_LOAD_TEST_RESOURCE_NAME }}
           resourceGroup: ${{ vars.AZURE_LOAD_TEST_RESOURCE_GROUP }}
-
       - name: Move results into loadtest/results
         if: always()
         run: |
           mkdir -p loadtest/results
-          if [ -d "loadTest" ]; then
-            cp -r loadTest/* loadtest/results/
+          if [ -d "${{ github.workspace }}/loadTest" ]; then
+            cp -r "${{ github.workspace }}/loadTest/"* loadtest/results/
+            echo "Copied files:"
+            find loadtest/results -type f
           else
             echo "No loadTest output folder found — nothing to move"
           fi
-
-      - name: Publish Load Test Results Artifacts
+      - name: Publish load test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
