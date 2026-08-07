@@ -1,18 +1,13 @@
-version: v1.0
-testName: DayforcePOCLoadTest1
-testPlan: practice_v2.jmx                  # Name of your downloaded JMX file
+version: v0.1
+testId: DayforcePOCLoadTest1
+testPlan: practice_v2.jmx
 description: Automated Azure Load Test
-
-# Load configuration
-engineInstances: 1                      # Number of test engine instances
-configFiles:                            # Fixed: Changed from configFileNames
+engineInstances: 1
+configurationFiles:
   - jmeter-plugins-influxdb2-listener-2.8.jar
-
-failureCriteria:                        # Set pass/fail criteria for pipeline
-  - p90(response_time_ms) > 1000        # Fails pipeline if 90th percentile > 1 sec
-  - percentage(error) > 1               # Fails pipeline if error rate > 1%
-
-# Optional settings
-env:                                    # Target URL / environment variables
+failureCriteria:
+  - p90(response_time_ms) > 1000
+  - percentage(error) > 1
+env:
   - name: TARGET_URL
     value: "https://www.google.com"
