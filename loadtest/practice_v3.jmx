@@ -101,7 +101,7 @@
           <stringProp name="filename"></stringProp>
         </ResultCollector>
         <hashTree/>
-        <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="Backend Listener" enabled="true">
+        <BackendListener guiclass="BackendListenerGui" testclass="BackendListener" testname="Backend Listener">
           <elementProp name="arguments" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="testName" elementType="Argument">
@@ -126,7 +126,7 @@
               </elementProp>
               <elementProp name="influxDBToken" elementType="Argument">
                 <stringProp name="Argument.name">influxDBToken</stringProp>
-                <stringProp name="Argument.value">IboK3H7CJ38U1CrFRT9qDVm2AX-prXJm90TbkQHMxL2FghoMpX9oLGAP-VVbJ73GXkGhA1y1aEzGj43sMEbxNQ==</stringProp>
+                <stringProp name="Argument.value">5n3DM8UGqvag-9pMKY2XkpSgiYHJoh69oslVEEjBtdU8jiXox3Qe03HSDSIcYY-s8Og6ZZBtK_3YAZnqggjK9w==</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
               <elementProp name="influxDBOrganization" elementType="Argument">
