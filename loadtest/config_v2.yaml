@@ -1,0 +1,14 @@
+version: v0.1
+testId: DayforcePOCLoadTest1
+testPlan: practice_v3.jmx
+description: Automated Azure Load Test
+engineInstances: 1
+configurationFiles:
+  - jmeter-plugins-influxdb2-listener-2.8.jar
+  - random_numbers.csv
+failureCriteria:
+  - p90(response_time_ms) > 1000
+  - percentage(error) > 1
+env:
+  - name: TARGET_URL
+    value: "https://www.google.com"
