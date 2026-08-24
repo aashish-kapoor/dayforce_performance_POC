@@ -1,0 +1,70 @@
+name: Dayforce Performance POC - Load Test Azure Monitor
+on:
+  workflow_dispatch:
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  run-load-test:
+    name: Run JMeter Load Test on Azure Load Testing
+    runs-on: ubuntu-latest
+    env:
+      ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: node20
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Run Azure Load Test
+        uses: azure/load-testing@v1
+        with:
+          loadTestConfigFile: 'loadtest/config.yaml'
+          loadTestResource: ${{ vars.AZURE_LOAD_TEST_RESOURCE_NAME }}
+          resourceGroup: ${{ vars.AZURE_LOAD_TEST_RESOURCE_GROUP }}
+      - name: Move results into loadtest/results
+        if: always()
+        run: |
+          mkdir -p loadtest/results
+          if [ -d "${{ github.workspace }}/loadTest" ]; then
+            cp -r "${{ github.workspace }}/loadTest/"* loadtest/results/
+            find loadtest/results -name "*.zip" -exec unzip -o {} -d loadtest/results \;
+            echo "Copied/extracted files:"
+            find loadtest/results -type f
+          else
+            echo "No loadTest output folder found — nothing to move"
+          fi
+      - name: Get access token for Log Analytics ingestion
+        id: token
+        if: always()
+        run: |
+          TOKEN=$(az account get-access-token --resource https://monitor.azure.com --query accessToken -o tsv)
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+      - name: Push results to Log Analytics
+        if: always()
+        env:
+          DCE_INGESTION_URL: https://dayforce-perf-poc-dce-eastus2-blrt.eastus2-1.ingest.monitor.azure.com
+          DCR_IMMUTABLE_ID: dcr-73e636d0857f4581a8fed55b87b21918
+          STREAM_NAME: Custom-JMeterResults_CL
+          ACCESS_TOKEN: ${{ steps.token.outputs.token }}
+          TEST_RUN_ID: ${{ github.run_id }}
+        run: |
+          JTL_FILE=$(find loadtest/results -type f \( -name "*.jtl" -o -name "*.csv" \) | grep -iv report | head -n 1)
+          if [ -z "$JTL_FILE" ]; then
+            echo "No results file found — skipping push"
+          else
+            echo "Pushing from: $JTL_FILE"
+            python3 loadtest/push_results.py "$JTL_FILE"
+          fi
+      - name: Publish load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: loadtest/results/
+          if-no-files-found: warn
