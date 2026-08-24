@@ -1,6 +1,6 @@
 version: v0.1
 testId: DayforcePOCLoadTest1
-testPlan: practice_v2.jmx
+testPlan: practice_v3.jmx
 description: Automated Azure Load Test
 engineInstances: 1
 configurationFiles:
